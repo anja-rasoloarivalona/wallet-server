@@ -1,5 +1,6 @@
 import Sequelize from 'sequelize'
 import sequelize from './index.js'
+///
 
 const Budget = sequelize.define(
     'budget',
