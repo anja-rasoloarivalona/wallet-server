@@ -1,5 +1,5 @@
 import Sequelize from 'sequelize'
-import sequelize from './index.js'
+import sequelize from './sequelize.js'
 
 const Transaction = sequelize.define(
     'transaction',
@@ -50,7 +50,8 @@ const Transaction = sequelize.define(
     },
     {   
         timestamps: false,
-        tableName: 'Transaction'
+        tableName: 'Transaction',
+        underscored: true
     }
 )
 

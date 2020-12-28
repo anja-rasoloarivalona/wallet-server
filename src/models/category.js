@@ -1,7 +1,7 @@
 import Sequelize from 'sequelize';
-import sequelize from './index.js'
+import sequelize from './sequelize.js'
 
-const Categorie = sequelize.define(
+const Category = sequelize.define(
     'categories',
     {
         master_id: {
@@ -44,5 +44,5 @@ const Categorie = sequelize.define(
 )
 
 export {
-    Categorie
+    Category
 }

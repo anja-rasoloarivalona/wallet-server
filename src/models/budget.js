@@ -1,5 +1,5 @@
 import Sequelize from 'sequelize'
-import sequelize from './index.js'
+import sequelize from './sequelize.js'
 ///
 
 const Budget = sequelize.define(
@@ -10,14 +10,16 @@ const Budget = sequelize.define(
             // field: "user_id",
             references: "user",
             referencesKey: "id",
-            allowNull: false
+            allowNull: false,
+            primaryKey: true
         },
         sub_id: {
             type: Sequelize.STRING(32),
             // field: "user_id",
             references: "categories",
             referencesKey: "sub_id",
-            allowNull: false
+            allowNull: false,
+            primaryKey: true
         },
         amount: {
             type: Sequelize.DECIMAL(16, 2),
@@ -36,7 +38,8 @@ const Budget = sequelize.define(
     },
     {   
         timestamps: false,
-        tableName: 'Budget'
+        tableName: 'Budget',
+        underscored: true
     }
 )
 

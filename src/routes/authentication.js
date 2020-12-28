@@ -2,7 +2,10 @@ import express from 'express'
 import ev from 'express-validator'
 import {
     signup,
-    activateAccount
+    logout,
+    login,
+    activateAccount,
+    verifyUserToken
 } from '../controllers/authentication.js'
 
 const authentication = express.Router()
@@ -18,6 +21,20 @@ authentication.post(
     signup
 )
 
+
+authentication.post(
+    '/login',
+    [ev.check('email').notEmpty(), ev.check('password').notEmpty()],
+    login
+);
+
+
+authentication.post(
+    '/logout', [], logout
+)
+
+
+
 authentication.post(
     '/signup/activate-account',
     [
@@ -25,6 +42,14 @@ authentication.post(
         ev.check('userId').notEmpty()
     ],
     activateAccount
+)
+
+authentication.post(
+    '/verify-user-token',
+    [
+        ev.check('token').notEmpty()
+    ],
+    verifyUserToken
 )
 
 export default authentication

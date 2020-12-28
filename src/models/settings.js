@@ -1,31 +1,28 @@
 import Sequelize from 'sequelize'
 import sequelize from './sequelize.js'
+///
 
-const Access = sequelize.define(
-    'access',
+const Settings = sequelize.define(
+    'settings',
     {
         user_id: {
             type: Sequelize.STRING(32),
             references: "user",
             referencesKey: "id",
+            allowNull: false,
             primaryKey: true
         },
-        token: {
-            type: Sequelize.STRING(255),
-            defaultValue: null
-        },
-        confirmation_email_token: {
-            type: Sequelize.STRING(32),
-            defaultValue: null
+        currency: {
+            type: Sequelize.STRING(255)
         }
     },
-    {
+    {   
         timestamps: false,
-        tableName: "Access",
+        tableName: 'settings',
         underscored: true
     }
 )
 
 export {
-    Access
+    Settings
 }

@@ -32,7 +32,6 @@ const checkEmail = async email => {
 }
 
 const verifyToken = params => {
-    console.log(params)
     if (params) {
         const [bearer, token] = params.split(' ');
         if (bearer && token) {
@@ -59,10 +58,14 @@ const generateToken = async user => {
             expiresIn: tokenExpiration
         }
     )
-    const generatedToken = await Access.upsert({
-        userId: id,
-        token,
+
+    const generatedToken = Access.upsert({
+        user_id: id,
+        token
+    }).then(function(test){
+        return test
     })
+
     return generatedToken ? token : false
 }
 
