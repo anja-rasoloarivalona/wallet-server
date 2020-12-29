@@ -3,7 +3,13 @@ import sequelize from './sequelize.js'
 
 const Category = sequelize.define(
     'categories',
-    {
+    {   
+        sub_id: {
+            type: Sequelize.STRING(32),
+            fied: "sub_id",
+            allowNull: false,
+            primaryKey: true,
+        },
         master_id: {
             type: Sequelize.STRING(32),
             allowNull: false
@@ -15,11 +21,6 @@ const Category = sequelize.define(
         master_icon: {
             type: Sequelize.STRING(255),
             allowNull: false
-        },
-        sub_id: {
-            type: Sequelize.STRING(32),
-            allowNull: false,
-            primaryKey: true
         },
         sub_name: {
             type: Sequelize.STRING(255),
@@ -39,7 +40,8 @@ const Category = sequelize.define(
     },
     {   
         timestamps: false,
-        tableName: 'Categories'
+        tableName: 'Categories',
+        underscored: true
     }
 )
 

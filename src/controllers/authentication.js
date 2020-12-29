@@ -1,7 +1,7 @@
 import ev from 'express-validator';
 import isEmail from 'validator/lib/isEmail.js';
 import { generateId } from '../utilities/index.js'
-import { User, Access, Settings, Budget, Asset } from '../models/index.js'
+import { User, Access, Settings, Budget, Asset, Category, BudgetCategory } from '../models/index.js'
 import { generateHashedPassword, checkPassword, checkEmail , generateToken, generateActivationLink, verifySignature, verifyToken } from '../services/authServices.js'
 import { sendActivationLink } from '../services/emailService.js'
 import Sequelize from 'sequelize'
@@ -45,13 +45,9 @@ const signup = async (req, res) => {
 
 const login = async(req, res) => {
     const errors = ev.validationResult(req);
-    console.log("logggin")
     if(errors.isEmpty()){
         try {
             const credentials = req.body;
-            console.log({
-                credentials
-            })
             const user = await User.findOne({
                 where: {
                     email: credentials.email,
@@ -169,31 +165,40 @@ const verifyUserToken = async (req, res) => {
                 attributes: ["user_id"]
             })
 
-            const responseData = await User.findOne({
-                where: {
-                    id: access.user_id
-                },
-                attributes: ['id', 'username', 'email'],
-                include: [
-                    {
-                        model: Settings,
-                        attributes: ["currency"],
-                        nested: true
+            if(access){
+                const responseData = await User.findOne({
+                    where: {
+                        id: access.user_id
                     },
-                    {
-                        model: Budget,
-                        attributes: ["sub_id", "amount", "used", "period"],
-                        nested: true
-                    },
-                    {
-                        model: Asset,
-                        attributes: ["type", "name", "amount"],
-                        nested: true
-                    }
-                ]
-            })
-
-            return res.success(responseData, 'Activation account successful', 201);
+                    attributes: ['id', 'username', 'email'],
+                    include: [
+                        {
+                            model: Budget,
+                            attributes: ["sub_id", "amount", "used", "period"],
+                            include: [
+                                {
+                                    model: Category,
+                                    attributes: ["master_name", "sub_name"],
+                                    raw: true
+                                }
+                            ],
+                            
+                        },
+                        {
+                            model: Settings,
+                            attributes: ["currency"],
+                        },
+                        {
+                            model: Asset,
+                            attributes: ["type", "name", "amount"],
+                        }
+                    ],
+                })
+    
+                return res.success(responseData, 'Activation account successful', 201);
+            }
+           
+            return res.error(["loool"], 'Failed to verify token', 500)
 
         } catch(err){
             console.log(err.message)

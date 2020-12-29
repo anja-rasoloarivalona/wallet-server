@@ -4,20 +4,20 @@ import sequelize from './sequelize.js'
 
 const Budget = sequelize.define(
     'budget',
-    {
-        user_id: {
+    {   
+        sub_id: {
             type: Sequelize.STRING(32),
-            // field: "user_id",
-            references: "user",
-            referencesKey: "id",
+            field: "sub_id",
+            references: "categories",
+            referencesKey: "sub_id",
             allowNull: false,
             primaryKey: true
         },
-        sub_id: {
+        user_id: {
             type: Sequelize.STRING(32),
-            // field: "user_id",
-            references: "categories",
-            referencesKey: "sub_id",
+            field: "user_id",
+            references: "user",
+            referencesKey: "id",
             allowNull: false,
             primaryKey: true
         },
@@ -37,6 +37,7 @@ const Budget = sequelize.define(
 
     },
     {   
+        modelName: "budget",
         timestamps: false,
         tableName: 'Budget',
         underscored: true

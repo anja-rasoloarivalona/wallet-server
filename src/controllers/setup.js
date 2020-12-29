@@ -9,6 +9,11 @@ const initSetup = async (req, res) => {
     if(errors.isEmpty()){
         try {
             const { body: { currency, assets, budget }, user_id } = req
+
+            const responseData = {
+                budget: [],
+                assets: []
+            }
             await Settings.upsert({
                 user_id,
                 currency: JSON.stringify(currency)
@@ -24,7 +29,6 @@ const initSetup = async (req, res) => {
             }
             if(assets && assets.length > 0){
                 await Promise.all(assets.map(async (item) => {
-                  
                     await Asset.upsert({
                         id: generateId(),
                         user_id,
@@ -32,7 +36,7 @@ const initSetup = async (req, res) => {
                     })                
                 }));
             }
-            return res.success([], 'Setup account successful', 201);
+            return res.success(responseData, 'Setup account successful', 201);
 
         } catch(error){
             console.log(error.message)
