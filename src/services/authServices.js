@@ -16,6 +16,7 @@ const generateHashedPassword = async password => {
 }
 
 const checkPassword = (password, hash) => {
+    console.log('cjhecking passowrd', password, hash)
     return bcrypt.compareSync(password, hash)
 }
 

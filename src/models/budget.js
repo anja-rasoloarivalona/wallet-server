@@ -32,7 +32,9 @@ const Budget = sequelize.define(
             defaultValue: 0
         },
         period: {
-            type: Sequelize.STRING(255)
+            type: Sequelize.STRING(255),
+            allowNull: false,
+            primaryKey: true
         },
 
     },

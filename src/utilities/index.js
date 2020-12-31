@@ -1,4 +1,5 @@
 import { v4 as uuid } from 'uuid'
+import { setDate } from './date.js'
 
 const generateId = () => {
     const id = uuid()
@@ -6,5 +7,6 @@ const generateId = () => {
 }
 
 export {
-    generateId
+    generateId,
+    setDate
 }

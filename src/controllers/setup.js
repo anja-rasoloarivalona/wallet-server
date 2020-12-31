@@ -1,6 +1,7 @@
 import ev from 'express-validator';
 import { Asset, Budget, Settings } from '../models/index.js'
 import { generateId } from '../utilities/index.js'
+import { getUser } from '../services/userService.js'
 
 const initSetup = async (req, res) => {
     const errors = ev.validationResult(req)
@@ -9,11 +10,6 @@ const initSetup = async (req, res) => {
     if(errors.isEmpty()){
         try {
             const { body: { currency, assets, budget }, user_id } = req
-
-            const responseData = {
-                budget: [],
-                assets: []
-            }
             await Settings.upsert({
                 user_id,
                 currency: JSON.stringify(currency)
@@ -36,7 +32,8 @@ const initSetup = async (req, res) => {
                     })                
                 }));
             }
-            return res.success(responseData, 'Setup account successful', 201);
+            const user = await getUser(user_id)
+            return res.success(user, 'Setup account successful', 201);
 
         } catch(error){
             console.log(error.message)

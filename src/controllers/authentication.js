@@ -1,10 +1,11 @@
 import ev from 'express-validator';
 import isEmail from 'validator/lib/isEmail.js';
 import { generateId } from '../utilities/index.js'
-import { User, Access, Settings, Budget, Asset, Category, BudgetCategory } from '../models/index.js'
+import { User, Access, Settings, Budget, Asset, Category } from '../models/index.js'
 import { generateHashedPassword, checkPassword, checkEmail , generateToken, generateActivationLink, verifySignature, verifyToken } from '../services/authServices.js'
 import { sendActivationLink } from '../services/emailService.js'
-import Sequelize from 'sequelize'
+import { getUser } from '../services/userService.js'
+
 
 const signup = async (req, res) => {
     const errors = ev.validationResult(req)
@@ -48,34 +49,12 @@ const login = async(req, res) => {
     if(errors.isEmpty()){
         try {
             const credentials = req.body;
-            const user = await User.findOne({
-                where: {
-                    email: credentials.email,
-                    password: {
-                        [Sequelize.Op.ne]: null
-                    }
-                },
-                attributes: ['id', 'username', 'password', 'email'],
-                include: [
-                    {
-                        model: Settings,
-                        attributes: ["currency"],
-                        nested: true
-                    },
-                    {
-                        model: Budget,
-                        attributes: ["sub_id", "amount", "used", "period"],
-                        nested: true
-                    },
-                    {
-                        model: Asset,
-                        attributes: ["type", "name", "amount"],
-                        nested: true
-                    }
-                ]
-            });
+            const user = await getUser(null, credentials)
             if(user !== null){
                 const passwordIsValid = checkPassword(credentials.password, user.password)
+                console.log({
+                    passwordIsValid
+                })
                 if(passwordIsValid){
                     const token = await generateToken(user);
                     if(token){
@@ -96,8 +75,9 @@ const login = async(req, res) => {
                 }
             }
         } catch(err){
+            console.log(err)
             console.log(err.message)
-            return res.error(err.message, 'Failed to login', 500)
+            return res.error(err.message, 'Failed to login', 501)
         }
     } else {
         console.log("errors", errors)
@@ -164,38 +144,10 @@ const verifyUserToken = async (req, res) => {
                 },
                 attributes: ["user_id"]
             })
-
-            if(access){
-                const responseData = await User.findOne({
-                    where: {
-                        id: access.user_id
-                    },
-                    attributes: ['id', 'username', 'email'],
-                    include: [
-                        {
-                            model: Budget,
-                            attributes: ["sub_id", "amount", "used", "period"],
-                            include: [
-                                {
-                                    model: Category,
-                                    attributes: ["master_name", "sub_name"],
-                                    raw: true
-                                }
-                            ],
-                            
-                        },
-                        {
-                            model: Settings,
-                            attributes: ["currency"],
-                        },
-                        {
-                            model: Asset,
-                            attributes: ["type", "name", "amount"],
-                        }
-                    ],
-                })
-    
-                return res.success(responseData, 'Activation account successful', 201);
+            if(access && access.user_id){
+                const user = await getUser(access.user_id)
+                console.log(user)
+                return res.success(user, 'Activation account successful', 201);
             }
            
             return res.error(["loool"], 'Failed to verify token', 500)

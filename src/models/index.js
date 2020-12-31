@@ -13,12 +13,12 @@ import Sequelize from 'sequelize'
 
 
 User.hasOne(Access, {
-    foreingKey: "user_id",
+    // foreignKey: "user_id",
     sourceKey: "id"
 })
 
 User.hasOne(Settings, {
-    foreingKey: "user_id",
+    // foreignKey: "user_id",
     sourceKey: "id",
 })
 
@@ -26,96 +26,52 @@ User.hasOne(Settings, {
 
 
 User.hasMany(Budget, {
-    foreingKey: "user_id",
+    // foreignKey: "user_id",
     sourceKey: "id"
 })
 
 Budget.belongsTo(User, {
-    foreingKey: "id",
+    // foreignKey: "id",
     sourceKey: "user_id" 
 })
 
 
 User.hasMany(Asset, {
-    foreingKey: "user_id",
+    // foreignKey: "user_id",
     sourceKey: "id"
 })
 
 Asset.belongsTo(User, {
-    foreingKey: "id",
+    // foreignKey: "id",
     sourceKey: "user_id" 
 })
-
-// Budget.hasOne(Category, {
-//     targetKey: "sub_id"
-// })
-
-
-
-const BudgetCategory = sequelize.define("budget_category", {
-    sub_id: {
-        type: Sequelize.STRING(32),
-        primaryKey: true,
-        allowNull: false
-    }
-}, {timeStamps: false, underscored: true})
 
 
 Budget.belongsTo(Category, {
     foreignKey: "sub_id",
 })
 
-// Category.hasMany(Budget, {
-//     foreingKey: "sub_id",
-//     sourceKey: "sub_id"
-// })
 
+User.hasMany(Transaction, {
+    foreignKey: "user_id",
+    sourceKey: "id"
+})
 
-// Category.belongsToMany(Budget, { through: BudgetCategory, foreingKey: "sub_id", targetKey: "sub_id" });
-// Budget.hasOne(BudgetCategory, {
-//     foreingKey: "sub_id",
-//     sourceKey: "sub_id"
-// })
-
-
-// Budget.hasOne(BudgetCategory)
-
-
-
-
-// Budget.belongsToMany(Category, { through: BudgetCategory, foreignKey: 'sub_id' });
-
-
-// Budget.hasMany(BudgetCategory)
-// Category.hasMany(BudgetCategory)
-
-// BudgetCategory.belongsTo(Budget)
-// Category.belongsTo(BudgetCategory)
-
-
-
-
-// Category.belongsToMany(Budget, {
-//     through: BudgetCategory,
-//     // unique_key: "sub_id"
-// })
-
-
-
-// Category.belongsToMany(Budget, {
-//     through: "sub_id",
-// })
-
-
-// User.hasMany(Transaction, {
-//     foreingKey: "user_id",
+// Transaction.belongsTo(User, {
+//     foreignKey: "user_id",
 //     sourceKey: "id"
 // })
 
-// Transaction.belongsTo(User, {
-//     foreingKey: "id",
-//     sourceKey: "user_id" 
-// })
+
+Transaction.belongsTo(Category, {
+    foreignKey: "sub_id",
+})
+
+Transaction.belongsTo(Asset, {
+    foreignKey: "asset_id",
+    sourceKey: "id"
+})
+
 
 
 export {
@@ -123,7 +79,6 @@ export {
     Asset,
     Budget,
     Category,
-    BudgetCategory,
     Settings,
     Transaction,
     User
