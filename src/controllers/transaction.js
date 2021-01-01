@@ -77,7 +77,9 @@ const addTransaction = async (req, res) => {
             if(!usedAsset){
                 return res.error(["No asset found"], 'Failed to add transaction', 404)
             }
-            const updatedAmount = type === "income" ? usedAsset.amount + parseInt(amount) : usedAsset.amount - parseInt(amount) 
+            const updatedAmount = type === "income" ? parseInt(usedAsset.amount)  + parseInt(amount) : parseInt(usedAsset.amount ) - parseInt(amount) 
+
+            console.log(updatedAmount)
             
             await Asset.update(
                 {
@@ -87,9 +89,7 @@ const addTransaction = async (req, res) => {
                     where: {
                         id: asset_id,
                         user_id,
-                    },
-                    returning: true,
-                    plain: true
+                    }
                 }
             )
             

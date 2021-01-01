@@ -44,7 +44,7 @@ const getUser = async (id, credentials) => {
             },
             {
                 model: Settings,
-                attributes: ["currency"],
+                attributes: ["currency", "dashboard"],
             },
             {
                 model: Asset,

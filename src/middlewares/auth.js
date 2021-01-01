@@ -2,6 +2,7 @@ import { User } from '../models/index.js'
 import {  verifyToken } from '../services/authServices.js'
 
 async function authMiddleware(req, res, next) {
+    console.log(req.get('Authorization'))
     const decoded = await verifyToken(req.get('Authorization'));
 
     if (decoded) {
@@ -18,6 +19,8 @@ async function authMiddleware(req, res, next) {
             return next();
         }
     }
+
+    console.log({decoded})
 
     return res.error([], 'Unauthorized', 401);
 }

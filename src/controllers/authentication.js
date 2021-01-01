@@ -146,7 +146,6 @@ const verifyUserToken = async (req, res) => {
             })
             if(access && access.user_id){
                 const user = await getUser(access.user_id)
-                console.log(user)
                 return res.success(user, 'Activation account successful', 201);
             }
            
