@@ -16,7 +16,6 @@ const generateHashedPassword = async password => {
 }
 
 const checkPassword = (password, hash) => {
-    console.log('cjhecking passowrd', password, hash)
     return bcrypt.compareSync(password, hash)
 }
 
@@ -70,6 +69,31 @@ const generateToken = async user => {
     return generatedToken ? token : false
 }
 
+const generateChangePasswordToken = async user => {
+    const { id, username } = user
+    const token = jwt.sign(
+        {
+            data: {
+                id,
+                username
+            }
+        },
+        secret,
+        {
+            expiresIn: tokenExpiration
+        }
+    )
+
+    const generatedToken = Access.upsert({
+        user_id: id,
+        change_password_token: token
+    }).then(function(test){
+        return test
+    })
+
+    return generatedToken ? token : false
+}
+
 const generateSignature = token => {
     const iv = crypto.randomBytes(16)
     const cipher = crypto.createCipheriv(encryptionAlgorithm, secret, iv)
@@ -100,6 +124,8 @@ export {
     checkPassword,
     generateActivationLink,
     generateToken,
+    generateChangePasswordToken,
     verifyToken,
-    verifySignature
+    verifySignature,
+    generateSignature
 }

@@ -17,6 +17,10 @@ const Access = sequelize.define(
         confirmation_email_token: {
             type: Sequelize.STRING(32),
             defaultValue: null
+        },
+        change_password_token: {
+            type: Sequelize.STRING(255),
+            defaultValue: null
         }
     },
     {

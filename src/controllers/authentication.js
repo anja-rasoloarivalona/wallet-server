@@ -49,31 +49,28 @@ const login = async(req, res) => {
     if(errors.isEmpty()){
         try {
             const credentials = req.body;
+
             const user = await getUser(null, credentials)
-            if(user !== null){
-                const passwordIsValid = checkPassword(credentials.password, user.password)
-                console.log({
-                    passwordIsValid
-                })
-                if(passwordIsValid){
-                    const token = await generateToken(user);
-                    if(token){
-                        const { id, username, email, assets, budgets, setting } = user
-                        return res.success({
-                            user: {
-                                id,
-                                token,
-                                username, 
-                                email,
-                                assets
-                            },
-                            budgets,
-                            setting
-                        }, 'Login successful', 200);
-                    }
-                    
-                }
+            if(!user){
+                return res.error("No user found", 'Failed to login', 404)
             }
+
+            const passwordIsValid = checkPassword(credentials.password, user.password)
+            if(!passwordIsValid){
+                return res.error("Wrong credentials", 'Failed to login', 401)
+            }
+
+            const token = await generateToken(user);
+            if(!token){
+                return res.error("Failed to generate new token", 'Failed to login', 500)
+            }
+            const userData = await getUser(user.id)
+            const loginResponse = {
+                userData,
+                token
+            }
+            return res.success(loginResponse, "Login successful", 200)
+
         } catch(err){
             console.log(err)
             console.log(err.message)

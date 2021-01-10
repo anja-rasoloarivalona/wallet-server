@@ -124,7 +124,8 @@ const addTransaction = async (req, res) => {
             return res.error(err.message, 'Failed to add transaction', 500)
         }
     }
-    return res.error(err.message, 'Failed to add transaction', 500)
+    console.log(errors)
+    return res.error(errors, 'Failed to add transaction', 500)
 
 }
 
