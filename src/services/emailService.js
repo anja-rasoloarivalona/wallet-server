@@ -42,6 +42,10 @@ const sendActivationLink = async (user, activationLink) => {
         })
 }
 
+const sendResetPasswordLink = async (email, link) => {
+  
+}
+
 export {
     sendActivationLink
 }

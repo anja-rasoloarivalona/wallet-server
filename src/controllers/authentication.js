@@ -173,6 +173,43 @@ const logout = async (req, res) => {
     return res.validation(errors.array());
 }
 
+const forgotPassword = async (req, res) => {
+    const errors = ev.validationResult(req)
+
+      
+    if(errors.isEmpty()){
+        const { body : { email } } = req
+            const user = await User.findOne({
+                where: {
+                    email: email
+                }
+            })
+            if(!user){
+                return res.error([], 'no user found', 404)
+            }
+            const token = generateId()
+
+            await Access.update({
+                reset_password_email_token: token
+            }, {
+                where: {
+                    user_id: user.id
+                }
+            })
+            
+
+        try {
+
+        } catch (err){
+            console.log('Failed to send email for resetting password', err.message)
+            return res.error(err, "Failed to send email for resetting password", 422)
+        }
+    }
+    console.log('errors', errors)
+    return res.error(errors, "Failed to send email for resetting password", 500)
+
+}
+
 export {
     signup,
     login,

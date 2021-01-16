@@ -21,6 +21,10 @@ const Access = sequelize.define(
         change_password_token: {
             type: Sequelize.STRING(255),
             defaultValue: null
+        },
+        reset_password_email_token: {
+            type: Sequelize.STRING(32),
+            defaultValue: null
         }
     },
     {
