@@ -7,7 +7,7 @@ const sendActivationLink = async (user, activationLink) => {
           {
             "to": [
               {
-                "email": "anja@bizbizshare.com",
+                "email": user.email,
                 "name": "John Doe"
               }
             ],
@@ -18,34 +18,66 @@ const sendActivationLink = async (user, activationLink) => {
               },
           }
         ],
-        "to": {
-            "email": "anja@bizbizshare.com",
-            "name": "John Doe"
-        },
         "from": {
           "email": "rasoloanja@gmail.com",
-          "name": "Monefy"
+          "name": "Monetor"
         },
         "reply_to": {
           "email": "rasoloanja@gmail.com",
-          "name": "Monefy"
+          "name": "Monetor"
         },
-        "template_id": "d-568c9f653ac04a47b0a0d0e37d2774fe"
+        "template_id": process.env.TEMPLATE_ID_ACTIVATION_LINK
     }
-    email
-        .send(data)
-        .then(() => {
-            console.log('Email sent')
-        })
-        .catch(error => {
-            console.log('Failed to send email', error)
-        })
+
+    try {
+        const response = await email.send(data)
+        if(response[0].statusCode === 202){
+            return true
+        } else {
+            return false
+        }
+    } catch (err){
+      console.log('Failed to send email', err)
+      return false
+    }
 }
 
-const sendResetPasswordLink = async (email, link) => {
-  
+const sendResetPasswordLink = async (user, resetPasswordLink) => {
+    const data = {
+      "dynamic_template_data": {
+        "subject": "Reset your password",
+        username: user.username,
+        resetPasswordLink
+      },
+      "to": {
+        "email": user.email,
+        "name": "John Doe"
+      },
+      "from": {
+        "email": "rasoloanja@gmail.com",
+        "name": "Monetor"
+      },
+      "reply_to": {
+        "email": "rasoloanja@gmail.com",
+        "name": "Monetor"
+      },
+      "template_id": process.env.TEMPLATE_ID_RESET_PASSWORD
+  }
+
+  try {
+      const response = await email.send(data)
+      if(response[0].statusCode === 202){
+          return true
+      } else {
+          return false
+      }
+  } catch (err){
+    console.log('Failed to send email', err)
+    return false
+  }
 }
 
 export {
-    sendActivationLink
+    sendActivationLink,
+    sendResetPasswordLink
 }

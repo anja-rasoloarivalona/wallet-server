@@ -2,8 +2,8 @@ import ev from 'express-validator';
 import isEmail from 'validator/lib/isEmail.js';
 import { generateId } from '../utilities/index.js'
 import { User, Access, Settings, Budget, Asset, Category } from '../models/index.js'
-import { generateHashedPassword, checkPassword, checkEmail , generateToken, generateActivationLink, verifySignature, verifyToken } from '../services/authServices.js'
-import { sendActivationLink } from '../services/emailService.js'
+import { generateHashedPassword, checkPassword, checkEmail , generateToken, generateActivationLink, verifySignature, verifyToken, generateResetPasswordLink, generateChangePasswordToken, generateSignature } from '../services/authServices.js'
+import { sendActivationLink, sendResetPasswordLink } from '../services/emailService.js'
 import { getUser } from '../services/userService.js'
 
 
@@ -11,7 +11,6 @@ const signup = async (req, res) => {
     const errors = ev.validationResult(req)
     const text_signup_failed = 'signup_failed'
 
-  
     if(errors.isEmpty()){
         const { body : data } = req
         const { email, username, password } = data
@@ -33,14 +32,15 @@ const signup = async (req, res) => {
             }
             const token = await generateToken(user)
             const activationLink = generateActivationLink(token, id)
-            await sendActivationLink(user, activationLink)
+            const emailSent = await sendActivationLink(user, activationLink)
+            if(!emailSent){
+                return res.error([], "Failed to send email", 502)
+            }
             return res.success(user, 'Signup successful', 201);
         } catch (err){
-            console.log('Failed to create user', err.message)
-            return res.error(err, text_signup_failed, 422)
+            return res.error(err.message, text_signup_failed, 422)
         }
     }
-    console.log('errors', errors)
     return res.error(errors, text_signup_failed, 500)
 }
 
@@ -175,10 +175,10 @@ const logout = async (req, res) => {
 
 const forgotPassword = async (req, res) => {
     const errors = ev.validationResult(req)
-
       
     if(errors.isEmpty()){
-        const { body : { email } } = req
+        try {
+            const { body : { email } } = req
             const user = await User.findOne({
                 where: {
                     email: email
@@ -196,18 +196,128 @@ const forgotPassword = async (req, res) => {
                     user_id: user.id
                 }
             })
-            
-
-        try {
+            const resetLink = generateResetPasswordLink(token, user.id)
+            const emailSent = await sendResetPasswordLink(user, resetLink)
+            if(!emailSent){
+                return res.error([], "Failed to send email", 502)
+            }
+            return res.success([], 'Send email success', 201);
 
         } catch (err){
-            console.log('Failed to send email for resetting password', err.message)
             return res.error(err, "Failed to send email for resetting password", 422)
         }
     }
-    console.log('errors', errors)
     return res.error(errors, "Failed to send email for resetting password", 500)
 
+}
+
+const checkResetPasswordSignature = async (req, res) => {
+    const errors = ev.validationResult(req)
+    if(errors.isEmpty()){
+        try {
+            const { body : { signature, id } } = req
+            const token = verifySignature(signature)
+
+            const access = await Access.findOne({
+                where: {
+                    reset_password_email_token: token
+                }
+            })
+            if(!access){
+                return res.error("Invalid signature", 'No access found', 404)
+            }
+
+            if(access.user_id !== id){
+                return res.error([], 'Invalid signature', 404)
+            }
+
+            const user = await User.findOne({
+                where: {
+                    id: access.user_id
+                }
+            })
+            const changePasswordToken = await generateChangePasswordToken(user)
+            const _signature = generateSignature(changePasswordToken)
+
+            await Access.update({
+                reset_password_email_token: null
+            }, {
+                where: {
+                    user_id: user.id
+                }
+            })
+
+            return res.success({signature: _signature}, 'Signature is valid', 201);
+
+        } catch (err){
+            console.log(err.message)
+            return res.error(err, "Failed to generate reset password token", 422)
+        }
+    }
+    return res.error(errors, "Invalid signature", 500)
+}
+
+const resetPassword = async(req, res) => {
+    const errors = ev.validationResult(req)
+
+    if(errors.isEmpty()){
+        try {
+            const  { password, signature } = req.body
+            const change_password_token = verifySignature(signature)
+
+            const access = await Access.findOne({
+                where: {
+                    change_password_token
+                }
+            })
+
+            if(!access){
+                return res.error("No access found, invalid signature", 'Failed to change password', 500)
+            }
+            const hashedPassword = await generateHashedPassword(password)
+
+            User
+                .update(
+                    {
+                        password: hashedPassword,
+                    },
+                    {
+                        where: {
+                            id: access.user_id
+                        }
+                    })
+                .then(() => {
+                    Access.update(
+                        {
+                            change_password_token: null,
+                            token: null
+                        },
+                        {
+                            where: {
+                                user_id: access.user_id
+                            }
+                        }
+                    )
+                    .then(() => {
+                        return res.success([], "Change password successfull", 201)
+                    })
+                    .catch(err => {
+                        return res.error(err, "Change password successfull but failed to get rid of tokens in access", 500)
+                    })         
+                })
+                .catch(err => {
+                    console.log("failed change password", err)
+                    return res.error(err, "Change password unsuccessfull", 401)
+                })
+
+        } catch(err){
+            console.log('err', err.message)
+            return res.error( err.message, 'Catch change password', 500)
+        }
+    } else {
+        console.log("errors", errors)
+        return res.error(errors, 'Failed to change password', 500)
+    }
 }
 
 export {
@@ -215,5 +325,8 @@ export {
     login,
     activateAccount,
     verifyUserToken,
-    logout
+    logout,
+    forgotPassword,
+    checkResetPasswordSignature,
+    resetPassword
 }

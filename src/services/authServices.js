@@ -83,15 +83,20 @@ const generateChangePasswordToken = async user => {
             expiresIn: tokenExpiration
         }
     )
-
-    const generatedToken = Access.upsert({
-        user_id: id,
+    await Access.update({
         change_password_token: token
-    }).then(function(test){
-        return test
+    }, {
+        where: {
+            user_id: id
+        }
     })
 
-    return generatedToken ? token : false
+    const updatedAccess = await Access.findOne({
+        where: {
+            change_password_token: token
+        }
+    })
+    return updatedAccess ? token : false
 }
 
 const generateSignature = token => {
@@ -112,11 +117,14 @@ const verifySignature = signature => {
 const generateActivationLink = (token, id) => {
     const APP_URL = process.env.APP_FRONT_END_URL
     const signature = generateSignature(token)
-    console.log('signature', signature)
-
     return `${APP_URL}/signup/activate?id=${id}&signature=${signature}`
 }
 
+const generateResetPasswordLink = (token, id) => {
+    const APP_URL =  process.env.APP_FRONT_END_URL
+    const signature = generateSignature(token)
+    return `${APP_URL}/reset-password?id=${id}&signature=${signature}`
+}
 
 export {
     checkEmail,
@@ -127,5 +135,6 @@ export {
     generateChangePasswordToken,
     verifyToken,
     verifySignature,
-    generateSignature
+    generateSignature,
+    generateResetPasswordLink
 }

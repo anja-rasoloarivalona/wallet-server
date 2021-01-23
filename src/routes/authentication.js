@@ -5,7 +5,10 @@ import {
     logout,
     login,
     activateAccount,
-    verifyUserToken
+    verifyUserToken,
+    forgotPassword,
+    checkResetPasswordSignature,
+    resetPassword
 } from '../controllers/authentication.js'
 
 const authentication = express.Router()
@@ -50,6 +53,33 @@ authentication.post(
         ev.check('token').notEmpty()
     ],
     verifyUserToken
+)
+
+authentication.post(
+    '/forgot-password',
+    [
+        ev.check('email').notEmpty()
+    ],
+    forgotPassword
+)
+
+authentication.post(
+    '/check-reset-signature',
+    [
+        ev.check('signature').notEmpty(),
+        ev.check('id').notEmpty()
+    ],
+    checkResetPasswordSignature
+)
+
+
+authentication.post(
+    '/reset-password',
+    [
+        ev.check('password').notEmpty(),
+        ev.check('signature').notEmpty()
+    ],
+    resetPassword
 )
 
 export default authentication
