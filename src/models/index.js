@@ -5,8 +5,10 @@ import { Category } from './category.js'
 import { Settings } from './settings.js'
 import { Transaction } from './transaction.js'
 import { User } from './user.js'
+import { Goal } from './goal.js'
 import sequelize from "./sequelize.js"
 import Sequelize from 'sequelize'
+
 
 
 
@@ -22,6 +24,14 @@ User.hasOne(Settings, {
     sourceKey: "id",
 })
 
+User.hasOne(Goal, {
+    sourceKey: "id",
+    foreignKey: "user_id"
+})
+
+Goal.belongsTo(User, {
+    sourceKey: "user_id" 
+})
 
 
 
@@ -34,6 +44,10 @@ Budget.belongsTo(User, {
     // foreignKey: "id",
     sourceKey: "user_id" 
 })
+
+// Goal.belongsTo(User, {
+//     sourceKey: "user_id" 
+// })
 
 
 User.hasMany(Asset, {
@@ -81,5 +95,6 @@ export {
     Category,
     Settings,
     Transaction,
-    User
+    User,
+    Goal
 }

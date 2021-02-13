@@ -13,10 +13,10 @@ const signup = async (req, res) => {
 
     if(errors.isEmpty()){
         const { body : data } = req
-        const { email, username, password } = data
+        const { email, username, password, lang } = data
         const existingUser = await checkEmail(email)
         if(existingUser){
-            return res.error([], 'email_taken', 409)
+            return res.error([], 'Email taken', 409)
         }
         try {
             const id = generateId()
@@ -31,7 +31,7 @@ const signup = async (req, res) => {
                 return res.error([], text_signup_failed, 500)
             }
             const token = await generateToken(user)
-            const activationLink = generateActivationLink(token, id)
+            const activationLink = generateActivationLink(token, id, lang)
             const emailSent = await sendActivationLink(user, activationLink)
             if(!emailSent){
                 return res.error([], "Failed to send email", 502)

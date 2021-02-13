@@ -3,7 +3,8 @@ import ev from 'express-validator'
 
 import {
     getChangePasswordSignature,
-    changePassword
+    changePassword,
+    addGoal
 } from '../controllers/user.js'
 
 const user = express.Router()
@@ -23,6 +24,15 @@ user.post(
         ev.check('signature').notEmpty() 
     ],
     changePassword
+)
+
+user.post(
+    '/goal',
+    [
+        ev.check('amount').notEmpty(),
+        ev.check('per_month').notEmpty() 
+    ],
+    addGoal
 )
 
 export default user

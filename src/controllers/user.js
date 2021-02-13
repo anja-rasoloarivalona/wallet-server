@@ -1,6 +1,7 @@
 import ev from 'express-validator';
-import { Asset, Budget, Settings, User, Access } from "../models/index.js"
+import { Asset, Budget, Settings, User, Access, Goal } from "../models/index.js"
 import { checkPassword, generateChangePasswordToken, generateSignature, generateHashedPassword, verifySignature } from '../services/authServices.js'
+import { generateId } from '../utilities/index.js'
 
 const getChangePasswordSignature = async (req, res) => {
     const errors = ev.validationResult(req)
@@ -95,7 +96,38 @@ const changePassword = async (req, res) => {
     }
 }
 
+const addGoal = async(req, res) => {
+    const errors = ev.validationResult(req)
+    if(errors.isEmpty()){
+        try {
+            const { body: data } = req
+            const { amount, per_month} = data
+            const goal_id = generateId()
+            await Goal.create({
+                user_id: req.user_id,
+                goal_id,
+                amount, 
+                per_month
+            })
+            const createdGoal = await Goal.findOne({
+                where: {
+                    goal_id
+                }
+            })
+            if(!createdGoal){
+                return res.error("Something went wrong", 'Failed to retrieve goal', 503)
+            }   
+            return res.success(createdGoal, "Goal added succesfully", 200)
+        } catch(err){
+            return res.error(err, 'Failed to set goal', 500)
+        }
+    }
+
+    return res.error(errors, 'Failed to set goal', 500)
+}
+
 export {
     changePassword,
-    getChangePasswordSignature
+    getChangePasswordSignature,
+    addGoal
 }

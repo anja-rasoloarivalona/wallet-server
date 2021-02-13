@@ -114,10 +114,11 @@ const verifySignature = signature => {
     
 }
 
-const generateActivationLink = (token, id) => {
+const generateActivationLink = (token, id, lang) => {
     const APP_URL = process.env.APP_FRONT_END_URL
     const signature = generateSignature(token)
-    return `${APP_URL}/signup/activate?id=${id}&signature=${signature}`
+    const path = lang === "fr" ? "activation" : "activate"
+    return `${APP_URL}/${path}?id=${id}&signature=${signature}`
 }
 
 const generateResetPasswordLink = (token, id) => {

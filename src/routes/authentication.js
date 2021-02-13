@@ -19,7 +19,8 @@ authentication.post(
     [
         ev.check('email').isEmail().notEmpty(),
         ev.check('username').notEmpty(),
-        ev.check('password').notEmpty()
+        ev.check('password').notEmpty(),
+        ev.check('lang').notEmpty()
     ],
     signup
 )

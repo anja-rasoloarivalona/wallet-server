@@ -1,45 +1,37 @@
 import Sequelize from 'sequelize'
 import sequelize from './sequelize.js'
 
-const Asset = sequelize.define(
-    'asset',
+const Goal = sequelize.define(
+    'goal',
     {
-        id: {
+        goal_id: {
             type: Sequelize.STRING(32),
             allowNull: false,
             primaryKey: true
         },
         user_id: {
             type: Sequelize.STRING(32),
-            // field: "user_id",
             references: "user",
             referencesKey: "id",
             allowNull: false,
-        },
-        type: {
-            type: Sequelize.STRING(255),
-            allowNull: false
-        },
-        name: {
-            type: Sequelize.STRING(255),
+            primaryKey: true
         },
         amount: {
             type: Sequelize.DECIMAL(16, 2),
-            defaultValue: 0,
             allowNull: false
         },
-        credit_limit: {
+        per_month: {
             type: Sequelize.DECIMAL(16, 2),
-            defaultValue: null
+            allowNull: false
         }
     },
     {   
         timestamps: false,
-        tableName: 'Asset',
+        tableName: 'Goal',
         underscored: true
     }
 )
 
 export {
-    Asset
+    Goal
 }

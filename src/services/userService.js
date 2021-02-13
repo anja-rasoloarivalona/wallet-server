@@ -1,4 +1,4 @@
-import { User, Budget, Category, Settings, Asset, Transaction } from '../models/index.js'
+import { User, Budget, Category, Settings, Asset, Transaction, Goal } from '../models/index.js'
 import Sequelize from 'sequelize'
 
 const getUser = async (id, credentials) => {
@@ -48,7 +48,11 @@ const getUser = async (id, credentials) => {
             },
             {
                 model: Asset,
-                attributes: ["id", "type", "name", "amount"],
+                attributes: ["id", "type", "name", "amount", "credit_limit"],
+            },
+            {
+                model: Goal,
+                attributes: ["goal_id", "amount", "per_month"]
             }
         ],
     })
