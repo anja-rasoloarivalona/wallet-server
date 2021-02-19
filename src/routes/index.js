@@ -8,6 +8,7 @@ import transaction from './transaction.js'
 import settings from './settings.js'
 import budget from './budget.js'
 import asset from './asset.js'
+import dashboard from './dashboard.js'
 
 const routes = express.Router()
 
@@ -22,6 +23,7 @@ routes.use("/transaction", transaction)
 routes.use("/settings", settings)
 routes.use("/budget", budget)
 routes.use("/asset", asset)
+routes.use("/dashboard", dashboard)
 
 
 export default routes

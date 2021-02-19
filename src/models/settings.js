@@ -14,10 +14,6 @@ const Settings = sequelize.define(
         },
         currency: {
             type: Sequelize.STRING(255)
-        },
-        dashboard: {
-            type: Sequelize.STRING(2550),
-            defautValue: null
         }
     },
     {   

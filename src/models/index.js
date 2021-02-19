@@ -6,6 +6,7 @@ import { Settings } from './settings.js'
 import { Transaction } from './transaction.js'
 import { User } from './user.js'
 import { Goal } from './goal.js'
+import { Dashboard } from './dashboard.js'
 import sequelize from "./sequelize.js"
 import Sequelize from 'sequelize'
 
@@ -96,5 +97,6 @@ export {
     Settings,
     Transaction,
     User,
-    Goal
+    Goal,
+    Dashboard
 }
