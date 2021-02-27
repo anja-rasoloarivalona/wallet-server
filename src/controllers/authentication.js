@@ -32,11 +32,17 @@ const signup = async (req, res) => {
             }
             const token = await generateToken(user)
             const activationLink = generateActivationLink(token, id, lang)
-            const emailSent = await sendActivationLink(user, activationLink)
-            if(!emailSent){
-                return res.error([], "Failed to send email", 502)
+           await sendActivationLink(user, activationLink)
+
+            const userData = await getUser(id)
+            const loginResponse = {
+                userData,
+                token
             }
-            return res.success(user, 'Signup successful', 201);
+            // if(!emailSent){
+            //     return res.error([], "Failed to send email", 502)
+            // }
+            return res.success(loginResponse, 'Signup successful', 201);
         } catch (err){
             return res.error(err.message, text_signup_failed, 422)
         }
