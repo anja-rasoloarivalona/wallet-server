@@ -24,12 +24,12 @@ const User = sequelize.define(
         createdAt: {
             type: 'TIMESTAMP',
             field: 'created_at',
-            defaultValue: sequelize.literal('CURRENT_TIMESTAMP')
+            defaultValue:  Sequelize.literal('CURRENT_TIMESTAMP')
         },
         updatedAt: {
             type: 'TIMESTAMP',
             field: 'updated_at',
-            defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
+            defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
         },
     },
     {   
